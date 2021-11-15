@@ -1,0 +1,57 @@
+version: "3.1"
+
+services:
+
+  db:
+    container_name: "db"
+    image: mysql
+    restart: always
+    environment:
+      MYSQ_PASSWORD: password
+      MYSQL_USER: user
+      MYSQL_DATABASE: test
+      MYSQL_ROOT_PASSWORD: example
+
+    ports:
+      - "3306:3306"
+      - "33060:33060"
+    command: --default-authentication-plugin=mysql_native_password
+    # volumes:
+      # - ./database_initializer/init_db.sql:/var/lib/mysql/init_db.sql
+    
+    
+
+  # db:
+  #   image: mysql:latest 
+  #   restart: always
+  #   command: --default-authentication-plugin=mysql_native_password
+  #   ports:
+  #     - 3306:3306
+  #   expose:
+  #     - 3306
+  #   environment:
+  #     #MYSQL_DATABASE: 'test'
+  #     MYSQL_ROOT_PASSWORD: 'root'
+  #   volumes:
+  #     - /myapp/database_initializer:/var/lib/mysql #initialize db 
+
+  rabbitmq:
+    image: rabbitmq
+    container_name: 'rabbitmq'
+    ports:
+      - "5672:5672"
+      
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    ports:
+      - '8000:8000'
+    volumes:
+      - .:/app
+    links:
+      - db
+    depends_on:
+      - db
+      - rabbitmq
+    restart: always

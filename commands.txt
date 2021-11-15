@@ -1,0 +1,2 @@
+docker build --tag whelp_app .
+docker run --publish 8000:8000 whelp_app
